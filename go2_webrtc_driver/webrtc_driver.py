@@ -159,14 +159,21 @@ class Go2WebRTCConnection:
 
             if track.kind == "video":
                 #await for the first frame, #ToDo make the code more nicer
-                frame = await track.recv()
-                await self.video.track_handler(track)
+                try:
+                    frame = await track.recv()
+                    await self.video.track_handler(track)
+                except Exception as e: 
+                    logging.error(e)  
+
                 
             if track.kind == "audio":
                 frame = await track.recv()
                 while True:
-                    frame = await track.recv()
-                    await self.audio.frame_handler(frame)
+                    try:
+                        frame = await track.recv()
+                        await self.audio.frame_handler(frame)
+                    except Exception as e: 
+                        logging.error(e)      
 
         logging.info("Creating offer...")
         offer = await self.pc.createOffer()
