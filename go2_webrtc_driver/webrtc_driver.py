@@ -156,24 +156,19 @@ class Go2WebRTCConnection:
         @self.pc.on("track")
         async def on_track(track):
             logging.info("Track recieved: %s", track.kind)
-
-            if track.kind == "video":
-                #await for the first frame, #ToDo make the code more nicer
-                try:
+            try:
+                if track.kind == "video":
+                    #await for the first frame, #ToDo make the code more nicer
                     frame = await track.recv()
                     await self.video.track_handler(track)
-                except Exception as e: 
-                    logging.error(e)  
-
-                
-            if track.kind == "audio":
-                frame = await track.recv()
-                while True:
-                    try:
+                    
+                if track.kind == "audio":
+                    frame = await track.recv()
+                    while True:
                         frame = await track.recv()
                         await self.audio.frame_handler(frame)
-                    except Exception as e: 
-                        logging.error(e)      
+            except Exception as e: 
+                        logging.error(e)                
 
         logging.info("Creating offer...")
         offer = await self.pc.createOffer()
