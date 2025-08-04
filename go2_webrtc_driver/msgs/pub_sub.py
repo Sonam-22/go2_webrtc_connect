@@ -117,6 +117,41 @@ class WebRTCDataChannelPubSub:
         # Publish the request
         return await self.publish(topic, request_payload, DATA_CHANNEL_TYPE["REQUEST"])
     
+
+    def send_command(self, topic, options=None):
+        # Generate a unique identifier
+        generated_id = int(time.time() * 1000) % 2147483648 + random.randint(0, 1000)
+        
+        # Check if api_id is provided
+        if not (options and "api_id" in options):
+            print("Error: Please provide app id")
+            return asyncio.Future().set_exception(Exception("Please provide app id"))
+
+        # Build the request header and parameter
+        request_payload = {
+            "header": {
+                "identity": {
+                    "id": options.get("id", generated_id),
+                    "api_id": options.get("api_id", 0)
+                }
+            },
+            "parameter": ""
+        }
+
+        # Add data to parameter
+        if options and "parameter" in options:
+            request_payload["parameter"] = options["parameter"] if isinstance(options["parameter"], str) else json.dumps(options["parameter"])
+
+        # Add priority if specified
+        if options and "priority" in options:
+            request_payload["header"]["policy"] = {
+                "priority": 1
+            }
+
+        # Publish the request
+        return self.publish_without_callback(topic, request_payload, DATA_CHANNEL_TYPE["REQUEST"]) 
+    
+    
     def subscribe(self, topic, callback=None):
         channel = self.channel
 
