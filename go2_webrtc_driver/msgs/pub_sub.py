@@ -124,8 +124,7 @@ class WebRTCDataChannelPubSub:
         
         # Check if api_id is provided
         if not (options and "api_id" in options):
-            print("Error: Please provide app id")
-            return asyncio.Future().set_exception(Exception("Please provide app id"))
+            logging.error("Error: Please provide app id")
 
         # Build the request header and parameter
         request_payload = {
